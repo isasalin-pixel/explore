@@ -1,26 +1,129 @@
-<!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en-EN">
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>EXPLORE's ART101 Homepage</title>
-    <link href="site.css" rel="stylesheet" type="text/css" />
-       <!-- jQuery library -->
-   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-   <!-- Link to external JavaScript file -->
-   <script src="site.js" DEFER></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Farm Game</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
-    <h1>This is EXPLORE's website homepage</h1>
+<div id="app">
 
-        <li>Links to EXPLORE's Web page </s></li>
-        <ol>
-            <li><a href="test/ex08.html">Animal Garden</a></li>
-        </ol>
+  <!-- 1. Start Screen: initial landing with game title and start button. Removes clutter and introduces the player to the game. -->
+  <section id="screen-start" class="screen active">
+    <div class="start-content">
+      <h1 class="game-title">My Farm</h1>
+      <button id="btn-start" class="btn-primary">Start</button>
     </div>
-    <h3>Have fun!</h3>
+  </section>
+
+  <!-- 2. Choose Screen: a simple selection screen to choose the Barn (inside) or the Outside area. -->
+  <section id="screen-choose" class="screen">
+    <div class="choose-content">
+      <h2 class="choose-title">Choose where to start!</h2>
+      <div class="choose-buttons">
+        <button id="btn-go-inside" class="btn-secondary">Inside</button>
+        <button id="btn-go-outside" class="btn-secondary">Outside</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Inside Scene (Barn): shows two animals (Pig & Sheep) and their food bar at the bottom. -->
+  <section id="screen-barn" class="screen">
+    <div class="scene-layout">
+      <div class="top-controls">
+        <button id="btn-to-outside" class="btn-secondary swap-btn">Go Outside</button>
+      </div>
+
+      <div class="animals-row">
+        <!-- Pig: animal entity with image, label, and sound data attribute -->
+        <div class="animal" data-animal-id="pig" data-sound="sounds/pig.mp3">
+          <div class="animal-label">Pig</div>
+          <img class="animal-image"
+               src="images/pig_normal.png"
+               data-normal="images/pig_normal.png"
+               data-happy="images/pig_happy.png"
+               alt="Pig">
+        </div>
+
+        <!-- Sheep: animal entity with image, label, and sound data attribute -->
+        <div class="animal" data-animal-id="sheep" data-sound="sounds/sheep.mp3">
+          <div class="animal-label">Sheep</div>
+          <img class="animal-image"
+               src="images/sheep_normal.png"
+               data-normal="images/sheep_normal.png"
+               data-happy="images/sheep_happy.png"
+               alt="Sheep">
+        </div>
+      </div>
+
+      <!-- Food bar: contains draggable foods below; each food element provides a `data-target` attribute that indicates the animal id that it should feed. -->
+      <div class="food-bar">
+        <div class="food" data-food-id="hay" data-target="sheep">
+          <img src="images/food_hay.png" alt="Hay for Sheep">
+        </div>
+        <div class="food" data-food-id="pig_slop" data-target="pig">
+          <img src="images/food_pig_slop.png" alt="Slop for Pig">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. Outside Scene: shows two animals (Horse & Duck) and a separate food bar at the bottom. -->
+  <section id="screen-outside" class="screen">
+    <div class="scene-layout">
+      <div class="top-controls">
+        <button id="btn-to-inside" class="btn-secondary swap-btn">Go Inside</button>
+      </div>
+
+      <div class="animals-row">
+        <!-- Horse: animal entity with image, label, and sound data attribute -->
+        <div class="animal" data-animal-id="horse" data-sound="sounds/horse.mp3">
+          <div class="animal-label">Horse</div>
+          <img class="animal-image"
+               src="images/horse_normal.png"
+               data-normal="images/horse_normal.png"
+               data-happy="images/horse_happy.png"
+               alt="Horse">
+        </div>
+
+        <!-- Duck: animal entity with image, label, and sound data attribute -->
+        <div class="animal" data-animal-id="duck" data-sound="sounds/duck.mp3">
+          <div class="animal-label">Duck</div>
+          <img class="animal-image"
+               src="images/duck_normal.png"
+               data-normal="images/duck_normal.png"
+               data-happy="images/duck_happy.png"
+               alt="Duck">
+        </div>
+      </div>
+
+      <div class="food-bar">
+        <div class="food" data-food-id="apple" data-target="horse">
+          <img src="images/food_apple.png" alt="Apple for Horse">
+        </div>
+        <div class="food" data-food-id="duck_fish" data-target="duck">
+          <img src="images/food_duck_fish.png" alt="Fish for Duck">
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 5. Ending Screen: displayed after all animals are fed; includes a restart control to replay the game. -->
+  <section id="screen-ending" class="screen">
+    <div class="ending-content">
+      <h2 class="ending-title">Thank you for feeding our friends!</h2>
+      <button id="btn-restart" class="btn-primary">Play again</button>
+    </div>
+  </section>
+
+</div>
+
+<!-- JS -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="main.js"></script>
 </body>
-
-
 </html>

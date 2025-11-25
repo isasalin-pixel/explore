@@ -1,0 +1,286 @@
+/* Base layout: set the html and body to fill the viewport, remove default margins and padding so backgrounds can cover the viewport fully. */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#app {
+  min-height: 100%;
+}
+
+/* All screens are hidden by default; add `.active` to a screen section to display it. This allows switching between views with CSS only. */
+.screen {
+  display: none;
+}
+
+.screen.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ---------- Start Screen ----------
+  Styles and layout for the initial landing screen (game title + Start button). */
+#screen-start {
+  background-image: url("images/start.png");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+.start-content {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 20px 40px;
+  border-radius: 16px;
+}
+
+.game-title {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  color: #2f3b1f;
+}
+
+/* Common button styles: base styles shared by primary and secondary buttons.
+  The primary button stands out using color and a drop shadow while the secondary button is more neutral. */
+.btn-primary,
+.btn-secondary {
+  font-size: 1.1rem;
+  padding: 10px 24px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-primary {
+  background-color: #ffcc54;
+  box-shadow: 0 4px 0 #e0a933;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #e0a933;
+}
+
+.btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #e0a933;
+}
+
+.btn-secondary {
+  background-color: #ffffff;
+  box-shadow: 0 3px 0 #cccccc;
+}
+
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 0 #cccccc;
+}
+
+.btn-secondary:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #cccccc;
+}
+
+/* ---------- Choose Screen ----------
+  Layout and styles for the screen where the player picks the starting location (Inside or Outside). */
+#screen-choose {
+  background-image: url("images/choose.png");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+.choose-content {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 24px 40px;
+  border-radius: 16px;
+}
+
+.choose-title {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #2f3b1f;
+}
+
+.choose-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+/* ---------- Inside / Outside Screens ----------
+  Background images and base layout for both 'inside' (barn) and 'outside' scenes. Each section uses a full-screen background. */
+#screen-barn {
+  background-image: url("images/inside.png");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+#screen-outside {
+  background-image: url("images/outside.png");
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+.scene-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.top-controls {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  padding: 8px 24px;
+}
+
+.swap-btn {
+  background: rgba(255,255,255,0.9);
+  color: #333;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+
+.animals-row {
+  display: flex;
+  gap: 40px;
+}
+
+/* Animal card design: display only the image and the label, avoid additional translucent cards or backgrounds so the artwork can stand out. */
+.animal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.animal-label {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.animal-image {
+  width: 500px;
+  height: 500px;
+  object-fit: contain;
+}
+
+/* Food bar: the row of draggable food items at the bottom of the scene. Each food item has its own width/height and is centered in the bar. */
+.food-bar {
+  display: flex;
+  gap: 16px;
+}
+
+.food {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+
+.food img {
+  max-width: 80%;
+  max-height: 80%;
+}
+
+/* Prevent image dragging and text selection: these rules disable native browser drag behaviors and selection so the custom drag logic functions smoothly without visual artifacts. */
+.animal-image, .food img {
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Dragging state for foods: when a food is being dragged it has a slightly lower opacity and the cursor changes to indicate grasping. */
+.food.dragging {
+  opacity: 0.8;
+  cursor: grabbing;
+}
+
+/* Used/consumed food appearance: once a food has been fed to an animal, mark it as `used`, visually dim it and prevent further interaction. */
+.food.used {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Incorrect feed feedback: highlight the animal briefly to indicate the user has attempted to feed the wrong food. This visual indicator draws attention without being disruptive. */
+.animal.wrong {
+  outline: 3px solid rgba(255, 80, 80, 0.9);
+}
+
+/* Correct feed feedback: highlight the animal in green after a successful feed to provide positive reinforcement. */
+.animal.fed {
+  outline: 3px solid rgba(100, 200, 120, 0.9);
+}
+
+/* ---------- Ending Screen ---------- */
+#screen-ending {
+  background-color: #8ecae6;
+  min-height: 100vh;
+}
+
+.ending-content {
+  text-align: center;
+}
+
+.ending-title {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+/* 只调整 Inside(谷仓内) 和 Outside(谷仓外) 的布局 */
+
+/* 让这两个 screen 不再用居中的 flex，而是普通块级布局 */
+#screen-barn.screen.active,
+#screen-outside.screen.active {
+  display: block;          /* 覆盖 .screen.active 的 flex 布局 */
+  position: relative;      /* 作为绝对定位的参照物 */
+  min-height: 100vh;
+}
+
+/* 动物：固定在左右下角（离底部留点空间给食物栏） */
+#screen-barn .animal,
+#screen-outside .animal {
+  position: absolute;
+  bottom: 120px;           /* 根据需要可微调高度 */
+}
+
+/* 左边那只（第一个 animal）→ 屏幕左下 */
+#screen-barn .animals-row .animal:first-child,
+#screen-outside .animals-row .animal:first-child {
+  left: 5%;                /* 离左边 5%，可调 */
+}
+
+/* 右边那只（最后一个 animal）→ 屏幕右下 */
+#screen-barn .animals-row .animal:last-child,
+#screen-outside .animals-row .animal:last-child {
+  right: 5%;               /* 离右边 5%，可调 */
+}
+
+/* 食物栏：底部中间横排 */
+#screen-barn .food-bar,
+#screen-outside .food-bar {
+  position: absolute;
+  bottom: 20px;            /* 靠近底部 */
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;           /* 一排并排 */
+  gap: 16px;               /* 图标间距 */
+}
