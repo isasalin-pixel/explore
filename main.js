@@ -1,4 +1,36 @@
-// Screen switching helper
+// ====================== 音效设置 ====================== //
+
+// 点击音效、投喂成功/失败音效
+const sfx = {
+  click:   new Audio("music/click/close-out-click.ogg"),
+  success: new Audio("music/click/feed-success.ogg"),
+  fail:    new Audio("music/click/feed-fail.ogg")
+};
+
+// 通用播放函数
+function playSound(name) {
+  const sound = sfx[name];
+  if (!sound) return;
+  sound.currentTime = 0;
+  sound.play();
+}
+
+// ====================== 背景音乐（MP3版） ====================== //
+
+// ⬇️ ⬇️ 这里更新成 background_music.mp3 ⬇️ ⬇️
+const bgm = new Audio("music/background_music.mp3");   
+bgm.loop = true;
+bgm.volume = 0.45;
+bgm._started = false;
+
+// 浏览器政策：必须用户触发后才能播放
+function initBGM() {
+  if (bgm._started) return;
+  bgm._started = true;
+  bgm.play().catch(() => {});
+}
+
+// ====================== 切换画面 ====================== //
 function showScreen(name) {
   $(".screen").removeClass("active");
   $("#screen-" + name).addClass("active");
@@ -10,175 +42,192 @@ let offsetY = 0;
 let totalAnimals = 0;
 let fedCount = 0;
 
-// Feed logic: check if the food is valid for the target animal and apply success/failure feedback
+// ====================== 投喂逻辑 ====================== //
 function feedAnimal(animalId, $food) {
   const $animal = $('.animal[data-animal-id="' + animalId + '"]');
-  if ($animal.hasClass("fed")) return; // if this animal has already been fed, do nothing
+
+  if ($animal.hasClass("fed")) return;
 
   const target = $food.data("target");
+
+  // ❌ 错误食物
   if (target && target !== animalId) {
-    // Wrong food: provide a short error visual indicator and return without changing animal state
     $animal.addClass("wrong");
     setTimeout(() => $animal.removeClass("wrong"), 400);
+
+    playSound("fail");
     return;
   }
 
-  // Correct feed: mark the animal as fed and update its visual state
+  // ✅ 正确食物
+  playSound("success");
   $animal.addClass("fed");
 
   const $img = $animal.find(".animal-image");
-  const happySrc = $img.data("happy");
-  if (happySrc) {
-    $img.attr("src", happySrc);
-  }
+  $img.attr("src", $img.data("happy"));
 
-  // Mark the food as used/consumed so it cannot be used again
   $food.addClass("used");
-
-  // Play a 'chewing' sound if the asset exists; ignore errors if it does not
-  try {
-    const chew = new Audio("sounds/chew.mp3");
-    chew.play();
-  } catch (e) {}
 
   fedCount++;
   if (fedCount >= totalAnimals) {
-    setTimeout(() => showScreen("ending"), 800);
+    setTimeout(() => showScreen("ending"), 900);
   }
 }
 
-// Initialize drag-and-drop interaction: mouse-based dragging of food items
+// ====================== 拖拽食物 ====================== //
 function initDragDrop() {
-  // Mousedown: begin dragging. Improvements: move the food element to the document body to avoid clipping by container overflow,
-  // and record the original parent, next sibling, and coordinates so we can animate/restore back on drop.
   $(document).on("mousedown", ".food", function (e) {
     e.preventDefault();
     const $food = $(this);
     if ($food.hasClass("used")) return;
 
     draggingFood = $food;
-    offsetX = e.clientX - this.getBoundingClientRect().left;
-    offsetY = e.clientY - this.getBoundingClientRect().top;
 
-    // Save original parent node, next sibling, and the original position to restore after completing the drag
-    $food.data('origParent', $food.parent());
-    $food.data('origNext', $food.next());
     const rect = this.getBoundingClientRect();
-    $food.data('origLeft', rect.left);
-    $food.data('origTop', rect.top);
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
 
-    // Append the element to the document body and make it fixed positioned so it will follow the pointer reliably
+    // 记录元素原始位置
+    $food.data("origParent", $food.parent());
+    $food.data("origNext", $food.next());
+    $food.data("origLeft", rect.left);
+    $food.data("origTop", rect.top);
+
     $(document.body).append($food);
-    // Temporarily disable page text selection while dragging to prevent selection artifacts
-    document.body.style.userSelect = 'none';
+    document.body.style.userSelect = "none";
 
     $food.addClass("dragging").css({
       position: "fixed",
-      left: rect.left + 'px',
-      top: rect.top + 'px',
+      left: rect.left,
+      top: rect.top,
       "z-index": 1000
     });
   });
 
-  // Mousemove: while dragging, update the element position to follow the cursor
   $(document).on("mousemove", function (e) {
     if (!draggingFood) return;
+
     draggingFood.css({
       left: e.clientX - offsetX,
       top: e.clientY - offsetY
     });
   });
 
-  // Mouseup: finish dragging; detect which animal (if any) is under the drop point, attempt to feed it, and animate the food back to its original location.
   $(document).on("mouseup", function (e) {
     if (!draggingFood) return;
 
     const $food = draggingFood;
     draggingFood = null;
 
+    let targetId = null;
     const x = e.clientX;
     const y = e.clientY;
-    let targetId = null;
 
     $(".animal").each(function () {
-      const rect = this.getBoundingClientRect();
-      if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+      const r = this.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
         targetId = $(this).data("animal-id");
       }
     });
 
-    if (targetId) {
-      feedAnimal(targetId, $food);
-    }
+    if (targetId) feedAnimal(targetId, $food);
 
-    // Smoothly animate the food back to its original screen coordinates and then reinsert into its original parent container in the DOM
-    const origLeft = $food.data('origLeft');
-    const origTop = $food.data('origTop');
-    const $origParent = $food.data('origParent');
-    const $origNext = $food.data('origNext');
+    // 归位动画
+    const origLeft = $food.data("origLeft");
+    const origTop = $food.data("origTop");
+    const $origParent = $food.data("origParent");
+    const $origNext = $food.data("origNext");
 
-    // Re-enable text selection now that the drag operation is complete
-    document.body.style.userSelect = '';
+    document.body.style.userSelect = "";
 
-    $food.removeClass('dragging').animate({
-      left: origLeft + 'px',
-      top: origTop + 'px'
-    }, 220, function () {
-      // Reattach the food element into the original DOM location, clear inline positioning styles and z-index
+    $food.removeClass("dragging").animate({
+      left: origLeft,
+      top: origTop
+    }, 200, function () {
       if ($origNext && $origNext.length) {
         $origNext.before($food);
       } else {
         $origParent.append($food);
       }
-      $food.css({ position: '', left: '', top: '', 'z-index': '' });
+
+      $food.css({
+        position: "",
+        left: "",
+        top: "",
+        "z-index": ""
+      });
     });
   });
 }
 
-// Init animal click sounds: when an animal element is clicked, play the audio referenced by its data attribute
+// ====================== 动物点击叫声 ====================== //
 function initAnimalSounds() {
   $(".animal").on("click", function () {
-    const soundPath = $(this).data("sound");
-    if (!soundPath) return;
-    try {
-      const audio = new Audio(soundPath);
-      audio.play();
-    } catch (e) {}
+    const path = $(this).data("sound");
+    if (!path) return;
+
+    const audio = new Audio(path);
+    audio.play().catch(() => {});
   });
 }
 
-// Reset the game state: clear 'fed' and 'wrong' classes, restore animals to normal images, and navigate back to the start screen
+// ====================== 重置游戏 ====================== //
 function resetGame() {
   fedCount = 0;
   $(".animal").removeClass("fed wrong");
   $(".food").removeClass("used");
 
-  // Restore all animal images to the normal state (use data-normal attribute)
   $(".animal-image").each(function () {
-    const $img = $(this);
-    const normalSrc = $img.data("normal");
-    if (normalSrc) {
-      $img.attr("src", normalSrc);
-    }
+    const normal = $(this).data("normal");
+    $(this).attr("src", normal);
   });
 
   showScreen("start");
 }
 
+// ====================== 初始化 ====================== //
 $(document).ready(function () {
   totalAnimals = $(".animal").length;
 
-  // Screen navigation button handlers
-  $("#btn-start").on("click", () => showScreen("choose"));
-  $("#btn-go-inside").on("click", () => showScreen("barn"));
-  $("#btn-go-outside").on("click", () => showScreen("outside"));
-  // Barn/Outside swap buttons
-  $("#btn-to-outside").on("click", () => showScreen("outside"));
-  $("#btn-to-inside").on("click", () => showScreen("barn"));
-  $("#btn-restart").on("click", resetGame);
+  // 按钮音效 + BGM 启动
+  $("#btn-start").on("click", () => {
+    playSound("click");
+    initBGM();
+    showScreen("choose");
+  });
+
+  $("#btn-go-inside").on("click", () => {
+    playSound("click");
+    initBGM();
+    showScreen("barn");
+  });
+
+  $("#btn-go-outside").on("click", () => {
+    playSound("click");
+    initBGM();
+    showScreen("outside");
+  });
+
+  $("#btn-to-outside").on("click", () => {
+    playSound("click");
+    initBGM();
+    showScreen("outside");
+  });
+
+  $("#btn-to-inside").on("click", () => {
+    playSound("click");
+    initBGM();
+    showScreen("barn");
+  });
+
+  $("#btn-restart").on("click", () => {
+    playSound("click");
+    initBGM();
+    resetGame();
+  });
 
   initDragDrop();
   initAnimalSounds();
-  // 禁止拖动图片的原生行为
+
   $(".animal-image, .food img").attr("draggable", false);
 });
