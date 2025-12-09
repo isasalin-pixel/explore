@@ -10,7 +10,7 @@
 <body>
 <div id="app">
 
-  <!-- 1. Start Screen: initial landing with game title and start button. Removes clutter and introduces the player to the game. -->
+  <!-- 1. Start Screen -->
   <section id="screen-start" class="screen active">
     <div class="start-content">
       <h1 class="game-title">My Farm</h1>
@@ -18,7 +18,7 @@
     </div>
   </section>
 
-  <!-- 2. Choose Screen: a simple selection screen to choose the Barn (inside) or the Outside area. -->
+  <!-- 2. Choose Screen -->
   <section id="screen-choose" class="screen">
     <div class="choose-content">
       <h2 class="choose-title">Choose where to start!</h2>
@@ -29,7 +29,7 @@
     </div>
   </section>
 
-  <!-- 3. Inside Scene (Barn): shows two animals (Pig & Sheep) and their food bar at the bottom. -->
+  <!-- 3. Inside Scene (Barn) -->
   <section id="screen-barn" class="screen">
     <div class="scene-layout">
       <div class="top-controls">
@@ -37,41 +37,74 @@
       </div>
 
       <div class="animals-row">
-        <!-- Pig: animal entity with image, label, and sound data attribute -->
-        <div class="animal" data-animal-id="pig" data-sound="sounds/pig.mp3">
+        <!-- Pig -->
+        <div class="animal" data-animal-id="pig" data-sound="sounds/pig_oink_short.wav">
           <div class="animal-label">Pig</div>
-          <img class="animal-image"
-               src="images/pig_normal.png"
-               data-normal="images/pig_normal.png"
-               data-happy="images/pig_happy.png"
-               alt="Pig">
+          <div class="animal-hearts">
+            <span class="heart" data-index="1">♥</span>
+            <span class="heart" data-index="2">♥</span>
+            <span class="heart" data-index="3">♥</span>
+          </div>
+          <div class="animal-body">
+            <img class="animal-image"
+                 src="images/pig_idle.png"
+                 data-idle="images/pig_idle.png"
+                 data-jump="images/pig_jump.png"
+                 data-love="images/pig_love.png"
+                 alt="Pig">
+          </div>
         </div>
 
-        <!-- Sheep: animal entity with image, label, and sound data attribute -->
-        <div class="animal" data-animal-id="sheep" data-sound="sounds/sheep.mp3">
+        <!-- Sheep -->
+        <div class="animal" data-animal-id="sheep" data-sound="sounds/sheep_baa.wav">
           <div class="animal-label">Sheep</div>
-          <img class="animal-image"
-               src="images/sheep_normal.png"
-               data-normal="images/sheep_normal.png"
-               data-happy="images/sheep_happy.png"
-               alt="Sheep">
+          <div class="animal-hearts">
+            <span class="heart" data-index="1">♥</span>
+            <span class="heart" data-index="2">♥</span>
+            <span class="heart" data-index="3">♥</span>
+          </div>
+          <div class="animal-body">
+            <img class="animal-image"
+                 src="images/sheep_idle.png"
+                 data-idle="images/sheep_idle.png"
+                 data-jump="images/sheep_jump.png"
+                 data-love="images/sheep_love.png"
+                 alt="Sheep">
+          </div>
         </div>
       </div>
 
-      <!-- Food bar: contains draggable foods below; each food element provides a `data-target` attribute that indicates the animal id that it should feed. -->
+      <!-- Food bar: 四个食物始终存在 -->
       <div class="food-bar">
-        <div class="food" data-food-id="hay" data-target="sheep">
-          <img src="images/food_hay.png" alt="Hay for Sheep">
+        <div class="food-slot">
+          <div class="food" data-food-id="hay" data-target="sheep">
+            <img src="images/food_hay.png" alt="Hay">
+          </div>
         </div>
-        <div class="food" data-food-id="pig_slop" data-target="pig">
-          <img src="images/food_pig_slop.png" alt="Slop for Pig">
+
+        <div class="food-slot">
+          <div class="food" data-food-id="pig_slop" data-target="pig">
+            <img src="images/food_pig_slop.png" alt="Pig Food">
+          </div>
+        </div>
+
+        <div class="food-slot">
+          <div class="food" data-food-id="apple" data-target="horse">
+            <img src="images/food_apple.png" alt="Apple">
+          </div>
+        </div>
+
+        <div class="food-slot">
+          <div class="food" data-food-id="duck_fish" data-target="duck">
+            <img src="images/food_duck_fish.png" alt="Fish">
+          </div>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- 4. Outside Scene: shows two animals (Horse & Duck) and a separate food bar at the bottom. -->
+  <!-- 4. Outside Scene -->
   <section id="screen-outside" class="screen">
     <div class="scene-layout">
       <div class="top-controls">
@@ -79,40 +112,74 @@
       </div>
 
       <div class="animals-row">
-        <!-- Horse: animal entity with image, label, and sound data attribute -->
-        <div class="animal" data-animal-id="horse" data-sound="sounds/horse.mp3">
+        <!-- Horse -->
+        <div class="animal" data-animal-id="horse" data-sound="sounds/horse_nicker.wav">
           <div class="animal-label">Horse</div>
-          <img class="animal-image"
-               src="images/horse_normal.png"
-               data-normal="images/horse_normal.png"
-               data-happy="images/horse_happy.png"
-               alt="Horse">
+          <div class="animal-hearts">
+            <span class="heart" data-index="1">♥</span>
+            <span class="heart" data-index="2">♥</span>
+            <span class="heart" data-index="3">♥</span>
+          </div>
+          <div class="animal-body">
+            <img class="animal-image"
+                 src="images/horse_idle.png"
+                 data-idle="images/horse_idle.png"
+                 data-jump="images/horse_jump.png"
+                 data-love="images/horse_love.png"
+                 alt="Horse">
+          </div>
         </div>
 
-        <!-- Duck: animal entity with image, label, and sound data attribute -->
-        <div class="animal" data-animal-id="duck" data-sound="sounds/duck.mp3">
+        <!-- Duck -->
+        <div class="animal" data-animal-id="duck" data-sound="sounds/duck_quack_kinda.wav">
           <div class="animal-label">Duck</div>
-          <img class="animal-image"
-               src="images/duck_normal.png"
-               data-normal="images/duck_normal.png"
-               data-happy="images/duck_happy.png"
-               alt="Duck">
+          <div class="animal-hearts">
+            <span class="heart" data-index="1">♥</span>
+            <span class="heart" data-index="2">♥</span>
+            <span class="heart" data-index="3">♥</span>
+          </div>
+          <div class="animal-body">
+            <img class="animal-image"
+                 src="images/duck_idle.png"
+                 data-idle="images/duck_idle.png"
+                 data-jump="images/duck_jump.png"
+                 data-love="images/duck_love.png"
+                 alt="Duck">
+          </div>
         </div>
       </div>
 
+      <!-- Food bar: 四个食物始终存在 -->
       <div class="food-bar">
-        <div class="food" data-food-id="apple" data-target="horse">
-          <img src="images/food_apple.png" alt="Apple for Horse">
+        <div class="food-slot">
+          <div class="food" data-food-id="hay" data-target="sheep">
+            <img src="images/food_hay.png" alt="Hay">
+          </div>
         </div>
-        <div class="food" data-food-id="duck_fish" data-target="duck">
-          <img src="images/food_duck_fish.png" alt="Fish for Duck">
+
+        <div class="food-slot">
+          <div class="food" data-food-id="pig_slop" data-target="pig">
+            <img src="images/food_pig_slop.png" alt="Pig Food">
+          </div>
+        </div>
+
+        <div class="food-slot">
+          <div class="food" data-food-id="apple" data-target="horse">
+            <img src="images/food_apple.png" alt="Apple">
+          </div>
+        </div>
+
+        <div class="food-slot">
+          <div class="food" data-food-id="duck_fish" data-target="duck">
+            <img src="images/food_duck_fish.png" alt="Fish">
+          </div>
         </div>
       </div>
 
     </div>
   </section>
 
-  <!-- 5. Ending Screen: displayed after all animals are fed; includes a restart control to replay the game. -->
+  <!-- 5. Ending Screen -->
   <section id="screen-ending" class="screen">
     <div class="ending-content">
       <h2 class="ending-title">Thank you for feeding our friends!</h2>
@@ -122,7 +189,6 @@
 
 </div>
 
-<!-- JS -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="main.js"></script>
 </body>

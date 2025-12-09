@@ -1,4 +1,4 @@
-/* Base layout: set the html and body to fill the viewport, remove default margins and padding so backgrounds can cover the viewport fully. */
+/* 基础布局 */
 html, body {
   height: 100%;
   margin: 0;
@@ -9,7 +9,7 @@ html, body {
   min-height: 100%;
 }
 
-/* All screens are hidden by default; add `.active` to a screen section to display it. This allows switching between views with CSS only. */
+/* 屏幕切换 */
 .screen {
   display: none;
 }
@@ -20,8 +20,7 @@ html, body {
   justify-content: center;
 }
 
-/* ---------- Start Screen ----------
-  Styles and layout for the initial landing screen (game title + Start button). */
+/* ---------- Start Screen ---------- */
 #screen-start {
   background-image: url("images/start.png");
   background-size: cover;
@@ -43,8 +42,7 @@ html, body {
   color: #2f3b1f;
 }
 
-/* Common button styles: base styles shared by primary and secondary buttons.
-  The primary button stands out using color and a drop shadow while the secondary button is more neutral. */
+/* 按钮 */
 .btn-primary,
 .btn-secondary {
   font-size: 1.1rem;
@@ -85,8 +83,7 @@ html, body {
   box-shadow: 0 1px 0 #cccccc;
 }
 
-/* ---------- Choose Screen ----------
-  Layout and styles for the screen where the player picks the starting location (Inside or Outside). */
+/* ---------- Choose Screen ---------- */
 #screen-choose {
   background-image: url("images/choose.png");
   background-size: cover;
@@ -114,8 +111,7 @@ html, body {
   justify-content: center;
 }
 
-/* ---------- Inside / Outside Screens ----------
-  Background images and base layout for both 'inside' (barn) and 'outside' scenes. Each section uses a full-screen background. */
+/* ---------- Inside / Outside ---------- */
 #screen-barn {
   background-image: url("images/inside.png");
   background-size: cover;
@@ -158,7 +154,7 @@ html, body {
   gap: 40px;
 }
 
-/* Animal card design: display only the image and the label, avoid additional translucent cards or backgrounds so the artwork can stand out. */
+/* ---------- Animal Base ---------- */
 .animal {
   display: flex;
   flex-direction: column;
@@ -166,21 +162,58 @@ html, body {
 }
 
 .animal-label {
-  font-size: 1.2rem;
-  margin-bottom: 8px;
+  font-size: 1.4rem;
+  margin-bottom: 4px;
   color: #333;
 }
 
+/* Hearts */
+.animal-hearts {
+  margin-bottom: 6px;
+}
+
+.heart {
+  font-size: 26px;
+  color: #cccccc;
+  margin: 0 3px;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.heart.full {
+  color: #e63946;
+  transform: scale(1.1);
+}
+
+/* 只翻转这一层，不翻转文字和爱心 */
+.animal-body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* 动物图片更大 */
 .animal-image {
-  width: 500px;
-  height: 500px;
+  width: 650px;
+  height: 650px;
   object-fit: contain;
 }
 
-/* Food bar: the row of draggable food items at the bottom of the scene. Each food item has its own width/height and is centered in the bar. */
+/* ---------- 食物栏位 UI ---------- */
 .food-bar {
   display: flex;
   gap: 16px;
+}
+
+.food-slot {
+  width: 80px;
+  height: 80px;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 6px rgba(0,0,0,0.4);
 }
 
 .food {
@@ -197,7 +230,7 @@ html, body {
   max-height: 80%;
 }
 
-/* Prevent image dragging and text selection: these rules disable native browser drag behaviors and selection so the custom drag logic functions smoothly without visual artifacts. */
+/* 禁止原生拖拽和选中 */
 .animal-image, .food img {
   -webkit-user-drag: none;
   -webkit-user-select: none;
@@ -206,26 +239,36 @@ html, body {
   -ms-user-select: none;
 }
 
-/* Dragging state for foods: when a food is being dragged it has a slightly lower opacity and the cursor changes to indicate grasping. */
+/* 拖动状态 */
 .food.dragging {
   opacity: 0.8;
   cursor: grabbing;
 }
 
-/* Used/consumed food appearance: once a food has been fed to an animal, mark it as `used`, visually dim it and prevent further interaction. */
+/* 已使用食物（目前逻辑中不再使用，但保留） */
 .food.used {
   opacity: 0.4;
   pointer-events: none;
 }
 
-/* Incorrect feed feedback: highlight the animal briefly to indicate the user has attempted to feed the wrong food. This visual indicator draws attention without being disruptive. */
+/* ========= 喂对 / 喂错 动画 ========= */
+
+/* 喂错：红框 + 抖动 */
 .animal.wrong {
   outline: 3px solid rgba(255, 80, 80, 0.9);
 }
 
-/* Correct feed feedback: highlight the animal in green after a successful feed to provide positive reinforcement. */
+.animal.wrong .animal-image {
+  animation: animal-shake 0.35s ease;
+}
+
+/* 喂对：小跳 */
 .animal.fed {
-  outline: 3px solid rgba(100, 200, 120, 0.9);
+  outline: none;
+}
+
+.animal.fed .animal-image {
+  animation: animal-happy 0.45s ease-out;
 }
 
 /* ---------- Ending Screen ---------- */
@@ -245,42 +288,50 @@ html, body {
   margin-bottom: 20px;
 }
 
-/* 只调整 Inside(谷仓内) 和 Outside(谷仓外) 的布局 */
+/* ---------- 场景：让动物贴底，移动交给 JS ---------- */
 
-/* 让这两个 screen 不再用居中的 flex，而是普通块级布局 */
 #screen-barn.screen.active,
 #screen-outside.screen.active {
-  display: block;          /* 覆盖 .screen.active 的 flex 布局 */
-  position: relative;      /* 作为绝对定位的参照物 */
+  display: block;
+  position: relative;
   min-height: 100vh;
 }
 
-/* 动物：固定在左右下角（离底部留点空间给食物栏） */
+/* 贴底。transform 由 JS 控制，添加过渡让移动更平滑 */
 #screen-barn .animal,
 #screen-outside .animal {
   position: absolute;
-  bottom: 120px;           /* 根据需要可微调高度 */
+  bottom: -80px;
+  transition: transform 3s ease-in-out;
 }
 
-/* 左边那只（第一个 animal）→ 屏幕左下 */
+/* 左右初始位置 */
 #screen-barn .animals-row .animal:first-child,
 #screen-outside .animals-row .animal:first-child {
-  left: 5%;                /* 离左边 5%，可调 */
+  left: 5%;
 }
 
-/* 右边那只（最后一个 animal）→ 屏幕右下 */
 #screen-barn .animals-row .animal:last-child,
 #screen-outside .animals-row .animal:last-child {
-  right: 5%;               /* 离右边 5%，可调 */
+  right: 5%;
 }
 
-/* 食物栏：底部中间横排 */
-#screen-barn .food-bar,
-#screen-outside .food-bar {
-  position: absolute;
-  bottom: 20px;            /* 靠近底部 */
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;           /* 一排并排 */
-  gap: 16px;               /* 图标间距 */
+/* ========= 跳跃动画 ========= */
+@keyframes animal-happy {
+  0% { transform: translateY(0) scale(1); }
+  30% { transform: translateY(-14px) scale(1.05); }
+  60% { transform: translateY(0) scale(1); }
+  80% { transform: translateY(-6px) scale(1.03); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* ========= 抖动动画 ========= */
+@keyframes animal-shake {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(-10px); }
+  30%  { transform: translateX(8px); }
+  45%  { transform: translateX(-6px); }
+  60%  { transform: translateX(4px); }
+  75%  { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
 }
